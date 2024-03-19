@@ -1,0 +1,38 @@
+--SQL Joins 
+CREATE DATABASE sandhiya;
+USE sandhiya;
+
+CREATE TABLE courses (
+    course_id INT PRIMARY KEY,
+    course_name VARCHAR(255),
+    instructor VARCHAR(255)
+);
+
+INSERT INTO courses (course_id, course_name, instructor)
+VALUES (111, 'BBA', 'Instructor1'),
+       (112, 'BSc', 'Instructor2'),
+       (113, 'BE', 'Instructor3');
+
+CREATE TABLE students (
+    student_id INT PRIMARY KEY,
+    name VARCHAR(255),
+    age INT,
+    course_id INT,
+    FOREIGN KEY (course_id) REFERENCES courses(course_id)
+);
+
+INSERT INTO students (student_id, name, age, course_id)
+VALUES (4126, 'Sandhiya', 18, 111),
+       (4127, 'Saranya', 19, 112),
+       (4128, 'Sangeetha', 20, 113);
+
+-- students enrolled courses 
+SELECT s.name AS student_name, c.course_name
+FROM students s
+INNER JOIN courses c ON s.course_id = c.course_id;
+
+-- courses the students are not enrolled
+SELECT c.course_name
+FROM courses c
+LEFT JOIN students s ON  c.course_id = s.course_id
+WHERE s.course_id IS NULL;
