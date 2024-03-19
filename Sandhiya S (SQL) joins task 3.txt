@@ -1,0 +1,133 @@
+Drop database if exists school;
+CREATE database if not exists school;
+USE school;
+
+CREATE TABLE student (
+    stu_id INT PRIMARY KEY,
+    stu_name VARCHAR(20),
+    age INT,
+    tea_id INT,
+    FOREIGN KEY (tea_id) REFERENCES teacher(tea_id)
+);
+
+INSERT INTO student VALUES
+    (4126, 'sandhiya', 20, 1234),
+    (4127, 'saranya', 23, 1235),
+    (4128, 'sangeetha', 22, 1236),
+    (4129, 'saveetha', 22, 1238),
+    (4130, 'shaalini', 25, 1234),
+    (4131, 'samyuktha', 26, 1235);
+
+CREATE TABLE teacher (
+    tea_id INT PRIMARY KEY,
+    tea_name VARCHAR(20),
+    age INT,
+    sub_name VARCHAR(20)
+);
+
+INSERT INTO teacher VALUES
+    (1234, 'Nithya', 35, 'tamil'),
+    (1235, 'Bala', 36, 'english'),
+    (1236, 'Malar', 37, 'maths'),
+    (1238, 'Devi', 35, 'science');
+    
+
+SELECT * FROM student;
+SELECT * FROM teacher;
+
+-- List all students and their assigned teachers
+SELECT 
+    s.stu_id AS student_id,
+    s.stu_name AS student_name,
+    s.age AS student_age,
+    t.tea_id AS teacher_id,
+    t.tea_name AS teacher_name,
+    t.age AS teacher_age,
+    t.sub_name AS subject
+FROM student s
+    JOIN teacher t ON s.tea_id = t.tea_id;
+-- List all teachers and their assigned students
+SELECT 
+    t.tea_id AS teacher_id,
+    t.tea_name AS teacher_name,
+    t.age AS teacher_age,
+    t.sub_name AS subject,
+    s.stu_id AS student_id,
+    s.stu_name AS student_name,
+    s.age AS student_age
+FROM     teacher t
+    LEFT JOIN student s ON t.tea_id = s.tea_id;
+    -- List all teachers who teach subjects that any student is studying.
+SELECT DISTINCT
+    t.tea_id AS teacher_id,
+    t.tea_name AS teacher_name,
+    t.age AS teacher_age,
+    t.sub_name AS subject
+FROM 
+    teacher t
+    JOIN student s ON t.tea_id = s.tea_id;
+-- List all students who are older than any teacher.
+SELECT stu_id, stu_name, age
+FROM student
+WHERE age > (SELECT MAX(age) FROM teacher);
+-- List all students who are older than any teacher
+SELECT tea_id, tea_name, age
+FROM teacher
+WHERE age > (SELECT MAX(age) FROM student);
+-- List all students who are studying either Math or Science.
+SELECT stu_id, stu_id, age
+FROM student
+WHERE stu_id IN (SELECT stu_id FROM student  WHERE sub_name = 'Math' OR sub_name = 'Science');
+-- List all teachers who have students assigned to them
+SELECT DISTINCT t.tea_id AS teacher_id, t.tea_name AS teacher_name FROM teacher t JOIN 
+student s ON t.tea_id = s.tea_id;
+-- List all subjects taught by either teachers or students, including duplicates
+SELECT sub_name FROM teacher
+UNION ALL
+SELECT sub_name FROM student;
+-- List all distinct subjects taught by either teachers or students
+SELECT sub_name FROM (
+    SELECT DISTINCT sub_name FROM teacher
+    UNION
+    SELECT DISTINCT sub_name FROM student
+) AS subjects;
+-- Create a view to list all students and their assigned teachers
+CREATE VIEW student_teacher_view AS
+SELECT
+    s.stu_id AS student_id,
+    s.stu_name AS student_name,
+    t.tea_id AS teacher_id,
+    t.tea_name AS teacher_name
+FROM
+    student s
+LEFT JOIN
+    student sa ON s.stu_id = sa.stu_id
+LEFT JOIN
+    teacher t ON sa.tea_id = t.tea_id;
+-- How can we improve the performance of the query to list all students along with their assigned teachers
+SELECT
+    s.stu_id AS student_id,
+    s.stu_name AS student_name,
+    t.tea_id AS teacher_id,
+    t.tea_name AS teacher_name
+FROM     student s
+LEFT JOIN (
+    SELECT s.stu_id, t.tea_id, t.tea_name FROM student s JOIN
+ teacher t ON s.tea_id = t.tea_id)
+ t ON s.stu_id = t.stu_id;
+
+
+
+    
+
+    
+
+    
+         
+	
+         
+            
+
+
+
+
